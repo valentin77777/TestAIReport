@@ -17,3 +17,8 @@
 - Buttons on forms: set `<Type>UsualButton</Type>` explicitly (1C writes it on save).
 - form-edit generates handler stubs in Russian syntax (`&НаСервере`, `Процедура`), and companion
   element names with Russian suffixes (`КонтекстноеМеню`, `РасширеннаяПодсказка`) — rewrite them in English.
+
+## HTML widgets on forms
+- HTML field on Windows thin client may use the Internet Explorer 11 engine: write ES5 JavaScript,
+  flexbox with -ms- prefixes, inline SVG, `<meta http-equiv="X-UA-Compatible" content="IE=edge">`,
+  no external CDNs. Keep the HTML in a Text template and fill placeholders from code.

@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #ffffff;
+    background: #0f2027;
+    -ms-user-select: none; user-select: none; cursor: default;
+  }
+  #card {
+    position: relative; height: 100%; box-sizing: border-box; padding: 18px 22px;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    transition: background 2s;
+    display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column;
+    overflow: hidden;
+  }
+  #card.morning { background: linear-gradient(135deg, #ff9a6b 0%, #f6c177 45%, #7fb2e5 100%); }
+  #card.day     { background: linear-gradient(135deg, #2b86c5 0%, #4facfe 55%, #79d1f8 100%); }
+  #card.evening { background: linear-gradient(135deg, #2e1a47 0%, #7b3f6e 50%, #f08a5d 100%); }
+  #card.night   { background: linear-gradient(135deg, #0b1026 0%, #1b2a4e 55%, #2f3f73 100%); }
+
+  .glow { position: absolute; border-radius: 50%; opacity: .18; background: #ffffff; }
+  .glow.g1 { width: 320px; height: 320px; right: -90px; top: -140px; }
+  .glow.g2 { width: 200px; height: 200px; left: -70px; bottom: -110px; }
+
+  .top { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;
+         -ms-flex-pack: justify; justify-content: space-between; position: relative; }
+
+  .clockbox { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; }
+  #analog { width: 96px; height: 96px; margin-right: 18px; }
+  .time { font-size: 54px; font-weight: 300; letter-spacing: 1px; line-height: 1; }
+  .time .sec { font-size: 24px; opacity: .7; margin-left: 4px; }
+  .date { font-size: 15px; opacity: .85; margin-top: 6px; text-transform: capitalize; }
+  .city { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; opacity: .7; margin-bottom: 4px; }
+
+  .now { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; text-align: right; }
+  .now .icon { width: 84px; height: 84px; margin-right: 12px; }
+  .temp { font-size: 58px; font-weight: 200; line-height: 1; }
+  .desc { font-size: 15px; opacity: .9; margin-top: 4px; text-transform: capitalize; }
+  .meta { font-size: 12px; opacity: .75; margin-top: 6px; }
+
+  .forecast { display: -ms-flexbox; display: flex; margin-top: 16px; position: relative; }
+  .day-card {
+    -ms-flex: 1; flex: 1; margin-right: 10px; padding: 10px 6px; text-align: center;
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+    border-radius: 14px; transition: background .3s;
+  }
+  .day-card:last-child { margin-right: 0; }
+  .day-card:hover { background: rgba(255,255,255,.26); }
+  .day-card.today { background: rgba(255,255,255,.28); }
+  .day-card .dn { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: .85; }
+  .day-card .icon { width: 40px; height: 40px; margin: 4px auto; }
+  .day-card .t { font-size: 15px; }
+  .day-card .t .min { opacity: .6; margin-left: 6px; }
+  .day-card .p { font-size: 11px; opacity: .75; margin-top: 2px; }
+
+  .error { margin-top: 16px; padding: 10px 14px; border-radius: 12px; font-size: 13px;
+           background: rgba(0,0,0,.25); }
+  .updated { position: absolute; right: 22px; bottom: 6px; font-size: 10px; opacity: .55; }
+
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .sun-rays { transform-origin: 32px 32px; animation: spin 24s linear infinite; }
+  @keyframes drift { 0% { transform: translateX(0); } 50% { transform: translateX(3px); } 100% { transform: translateX(0); } }
+  .cloud-move { animation: drift 5s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div id="card">
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+
+  <div class="top">
+    <div class="clockbox">
+      <svg id="analog" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="47" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>
+        <g id="ticks"></g>
+        <line id="hh" x1="50" y1="50" x2="50" y2="27" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        <line id="mh" x1="50" y1="50" x2="50" y2="15" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <line id="sh" x1="50" y1="58" x2="50" y2="10" stroke="#ffcf5c" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="50" cy="50" r="3.2" fill="#ffcf5c"/>
+      </svg>
+      <div>
+        <div class="city">Chisinau &middot; Moldova</div>
+        <div class="time"><span id="hm">--:--</span><span class="sec" id="ss">--</span></div>
+        <div class="date" id="date"></div>
+      </div>
+    </div>
+
+    <div class="now" id="now"></div>
+  </div>
+
+  <div class="forecast" id="forecast"></div>
+  <div class="updated" id="updated"></div>
+</div>
+
+<script>
+var WEATHER = /*WEATHER_JSON*/null;
+var UPDATED = "/*UPDATED*/";
+
+var DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December"];
+
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+// ---------- Icons (inline SVG, 64x64) ----------
+function sunSvg(cx, cy, r) {
+  var rays = "";
+  for (var i = 0; i < 8; i++) {
+    var a = i * Math.PI / 4;
+    rays += '<line x1="' + (cx + Math.cos(a) * (r + 5)) + '" y1="' + (cy + Math.sin(a) * (r + 5)) +
+            '" x2="' + (cx + Math.cos(a) * (r + 11)) + '" y2="' + (cy + Math.sin(a) * (r + 11)) +
+            '" stroke="#ffd25a" stroke-width="3" stroke-linecap="round"/>';
+  }
+  return '<g class="sun-rays">' + rays + '</g><circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#ffd25a"/>';
+}
+function moonSvg() {
+  return '<path d="M40 12 A20 20 0 1 0 52 44 A16 16 0 1 1 40 12 Z" fill="#f4f1c9"/>';
+}
+function cloudSvg(fill, dy) {
+  dy = dy || 0;
+  return '<g class="cloud-move"><path transform="translate(0,' + dy + ')" d="M18 48 h30 a10 10 0 0 0 0 -20 a14 14 0 0 0 -26 -4 a10 10 0 0 0 -4 24 z" fill="' + fill + '"/></g>';
+}
+function drops(color, symbol) {
+  var s = "";
+  for (var i = 0; i < 3; i++) {
+    var x = 22 + i * 10;
+    s += symbol === "snow"
+      ? '<circle cx="' + x + '" cy="' + (55 + (i % 2) * 4) + '" r="2.4" fill="' + color + '"/>'
+      : '<line x1="' + x + '" y1="52" x2="' + (x - 3) + '" y2="60" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round"/>';
+  }
+  return s;
+}
+function weatherIcon(code, isDay) {
+  var body;
+  if (code === 0) {
+    body = isDay ? sunSvg(32, 32, 12) : moonSvg();
+  } else if (code <= 2) {
+    body = (isDay ? sunSvg(24, 22, 9) : '<g transform="translate(-8,-6) scale(.8)">' + moonSvg() + '</g>') + cloudSvg("#ffffff", 4);
+  } else if (code === 3) {
+    body = cloudSvg("#dfe7ef", -4) + cloudSvg("#ffffff", 4);
+  } else if (code <= 48) {
+    body = cloudSvg("#e8edf2", -6) +
+      '<line x1="12" y1="52" x2="52" y2="52" stroke="#e8edf2" stroke-width="3" stroke-linecap="round"/>' +
+      '<line x1="18" y1="59" x2="46" y2="59" stroke="#e8edf2" stroke-width="3" stroke-linecap="round"/>';
+  } else if (code <= 67 || (code >= 80 && code <= 82)) {
+    body = cloudSvg("#e6edf5", -6) + drops("#7cc4ff", "rain");
+  } else if (code <= 77 || code === 85 || code === 86) {
+    body = cloudSvg("#ffffff", -6) + drops("#ffffff", "snow");
+  } else {
+    body = cloudSvg("#c9d3df", -6) + '<path d="M34 46 l-8 10 h7 l-4 9 l11 -13 h-7 l4 -6 z" fill="#ffd25a"/>';
+  }
+  return '<svg viewBox="0 0 64 64" width="100%" height="100%">' + body + '</svg>';
+}
+function weatherText(code) {
+  if (code === 0) return "clear sky";
+  if (code === 1) return "mainly clear";
+  if (code === 2) return "partly cloudy";
+  if (code === 3) return "overcast";
+  if (code <= 48) return "fog";
+  if (code <= 57) return "drizzle";
+  if (code <= 67) return "rain";
+  if (code <= 77) return "snow";
+  if (code <= 82) return "rain showers";
+  if (code <= 86) return "snow showers";
+  return "thunderstorm";
+}
+
+// ---------- Clock ----------
+(function buildTicks() {
+  var g = document.getElementById("ticks"), s = "";
+  for (var i = 0; i < 12; i++) {
+    var a = i * Math.PI / 6, r1 = i % 3 === 0 ? 37 : 40;
+    s += '<line x1="' + (50 + Math.sin(a) * r1) + '" y1="' + (50 - Math.cos(a) * r1) +
+         '" x2="' + (50 + Math.sin(a) * 44) + '" y2="' + (50 - Math.cos(a) * 44) +
+         '" stroke="rgba(255,255,255,0.8)" stroke-width="' + (i % 3 === 0 ? 2.5 : 1.2) + '" stroke-linecap="round"/>';
+  }
+  var wrap = document.createElement("div");
+  wrap.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
+  var lines = wrap.firstChild.childNodes;
+  while (lines.length) { g.appendChild(lines[0]); }
+})();
+
+function setHand(id, deg) {
+  document.getElementById(id).setAttribute("transform", "rotate(" + deg + " 50 50)");
+}
+
+function dayPhase(h) {
+  if (h >= 5 && h < 10) return "morning";
+  if (h >= 10 && h < 17) return "day";
+  if (h >= 17 && h < 21) return "evening";
+  return "night";
+}
+
+function tick() {
+  var d = new Date(), h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+  document.getElementById("hm").innerHTML = pad(h) + ":" + pad(m);
+  document.getElementById("ss").innerHTML = pad(s);
+  document.getElementById("date").innerHTML =
+    DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+  setHand("hh", (h % 12) * 30 + m * 0.5);
+  setHand("mh", m * 6 + s * 0.1);
+  setHand("sh", s * 6);
+  var card = document.getElementById("card"), phase = dayPhase(h);
+  if (card.className !== phase) card.className = phase;
+}
+
+// ---------- Weather ----------
+function parseIsoDate(str) {
+  var p = str.split("-");
+  return new Date(+p[0], +p[1] - 1, +p[2]);
+}
+
+function renderWeather() {
+  var now = document.getElementById("now"), fc = document.getElementById("forecast");
+  if (!WEATHER || WEATHER.error || !WEATHER.current) {
+    now.innerHTML = "";
+    fc.innerHTML = '<div class="error">Weather is unavailable: ' +
+      ((WEATHER && WEATHER.error) ? WEATHER.error : "no data") + '</div>';
+    return;
+  }
+  var c = WEATHER.current, dl = WEATHER.daily;
+  now.innerHTML =
+    '<div class="icon">' + weatherIcon(c.weather_code, c.is_day === 1) + '</div>' +
+    '<div><div class="temp">' + Math.round(c.temperature_2m) + '&deg;</div>' +
+    '<div class="desc">' + weatherText(c.weather_code) + '</div>' +
+    '<div class="meta">Feels like ' + Math.round(c.apparent_temperature) + '&deg; &middot; ' +
+    'Humidity ' + Math.round(c.relative_humidity_2m) + '% &middot; ' +
+    'Wind ' + Math.round(c.wind_speed_10m) + ' km/h</div></div>';
+
+  var html = "";
+  for (var i = 0; i < dl.time.length; i++) {
+    var dt = parseIsoDate(dl.time[i]);
+    html += '<div class="day-card' + (i === 0 ? ' today' : '') + '">' +
+      '<div class="dn">' + (i === 0 ? "Today" : DAYS_SHORT[dt.getDay()]) + '</div>' +
+      '<div class="icon">' + weatherIcon(dl.weather_code[i], true) + '</div>' +
+      '<div class="t">' + Math.round(dl.temperature_2m_max[i]) + '&deg;' +
+      '<span class="min">' + Math.round(dl.temperature_2m_min[i]) + '&deg;</span></div>' +
+      '<div class="p">&#9730; ' + (dl.precipitation_probability_max[i] == null ? 0 : dl.precipitation_probability_max[i]) + '%</div>' +
+      '</div>';
+  }
+  fc.innerHTML = html;
+  document.getElementById("updated").innerHTML = "Updated " + UPDATED + " &middot; Open-Meteo";
+}
+
+tick();
+renderWeather();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

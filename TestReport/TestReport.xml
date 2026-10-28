@@ -27,6 +27,7 @@
 		<ChildObjects>
 			<Form>Form</Form>
 			<Template>Template</Template>
+			<Template>WeatherWidget</Template>
 		</ChildObjects>
 	</ExternalReport>
 </MetaDataObject>

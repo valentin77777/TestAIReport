@@ -84,105 +84,97 @@ EndProcedure
 &AtServer
 Procedure OnCreateAtServer(Cancel, StandardProcessing)
 	
-	Items.WeatherLabel.Title = GetWeatherForecast();
+	WidgetHTML = BuildWidgetHTML();
 	
 EndProcedure
 
 &AtClient
 Procedure OnOpen(Cancel)
 	
-	UpdateClock();
-	AttachIdleHandler("UpdateClock", 1, False);
+	// The clock ticks inside the widget itself (JavaScript, once per second).
+	// The idle handler refreshes the weather data every 10 minutes.
+	AttachIdleHandler("RefreshWeather", 600, False);
 	
 EndProcedure
 
 &AtClient
 Procedure OnClose(Exit)
 	
-	DetachIdleHandler("UpdateClock");
+	DetachIdleHandler("RefreshWeather");
 	
 EndProcedure
 
 #EndRegion
 
-#Region Clock
+#Region Widget
 
 &AtClient
-Procedure UpdateClock() Export
+Procedure RefreshWeather() Export
 	
-	Items.ClockLabel.Title = Format(CurrentDate(), "DF=dd.MM.yyyy HH:mm:ss");
+	WidgetHTML = BuildWidgetHTMLAtServer();
 	
 EndProcedure
+
+&AtServer
+Function BuildWidgetHTMLAtServer()
+	
+	Return BuildWidgetHTML();
+	
+EndFunction
+
+// Builds the clock + weather widget from the WeatherWidget template.
+&AtServer
+Function BuildWidgetHTML()
+	
+	ReportObject = FormAttributeToValue("Object");
+	HTMLText = ReportObject.GetTemplate("WeatherWidget").GetText();
+	
+	HTMLText = StrReplace(HTMLText, "/*WEATHER_JSON*/null", GetWeatherJSON());
+	HTMLText = StrReplace(HTMLText, "/*UPDATED*/", Format(CurrentSessionDate(), "DF=HH:mm"));
+	
+	Return HTMLText;
+	
+EndFunction
 
 #EndRegion
 
 #Region Weather
 
-// Current weather and today's forecast for Chisinau from Open-Meteo (no API key needed).
+// Current weather and a 5-day forecast for Chisinau from Open-Meteo (no API key needed).
+// Returns the JSON text for the widget, or {"error": "..."} if the service is unavailable.
 &AtServer
-Function GetWeatherForecast()
+Function GetWeatherJSON()
 	
 	Try
 		
 		Connection = New HTTPConnection("api.open-meteo.com", 443, , , , 10,
 			New OpenSSLSecureConnection);
 		Request = New HTTPRequest("/v1/forecast?latitude=47.0105&longitude=28.8638"
-			+ "&current=temperature_2m,weather_code,wind_speed_10m"
-			+ "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max"
-			+ "&timezone=Europe%2FChisinau&forecast_days=1");
+			+ "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day"
+			+ "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+			+ "&timezone=Europe%2FChisinau&forecast_days=5");
 		Response = Connection.Get(Request);
 		
 		If Response.StatusCode <> 200 Then
-			Return "Weather in Chisinau: service unavailable (HTTP " + Response.StatusCode + ")";
+			Return ErrorJSON("service returned HTTP " + Response.StatusCode);
 		EndIf;
 		
-		Reader = New JSONReader;
-		Reader.SetString(Response.GetBodyAsString("UTF-8"));
-		Data = ReadJSON(Reader);
-		Reader.Close();
-		
-		Current = Data.current;
-		Daily = Data.daily;
-		
-		Return StrTemplate("Weather in Chisinau: %1, %2 °C, wind %3 km/h. Today: %4…%5 °C, precipitation %6%%",
-			WeatherDescription(Current.weather_code),
-			Round(Current.temperature_2m),
-			Round(Current.wind_speed_10m),
-			Round(Daily.temperature_2m_min[0]),
-			Round(Daily.temperature_2m_max[0]),
-			Daily.precipitation_probability_max[0]);
+		Return Response.GetBodyAsString("UTF-8");
 		
 	Except
-		Return "Weather in Chisinau: failed to load (" + BriefErrorDescription(ErrorInfo()) + ")";
+		Return ErrorJSON(BriefErrorDescription(ErrorInfo()));
 	EndTry;
 	
 EndFunction
 
-// WMO weather code -> text.
 &AtServer
-Function WeatherDescription(Code)
+Function ErrorJSON(Text)
 	
-	If Code = 0 Then
-		Return "clear sky";
-	ElsIf Code <= 2 Then
-		Return "partly cloudy";
-	ElsIf Code = 3 Then
-		Return "overcast";
-	ElsIf Code <= 48 Then
-		Return "fog";
-	ElsIf Code <= 57 Then
-		Return "drizzle";
-	ElsIf Code <= 67 Then
-		Return "rain";
-	ElsIf Code <= 77 Then
-		Return "snow";
-	ElsIf Code <= 82 Then
-		Return "rain showers";
-	ElsIf Code <= 86 Then
-		Return "snow showers";
-	Else
-		Return "thunderstorm";
-	EndIf;
+	Writer = New JSONWriter;
+	Writer.SetString();
+	Data = New Structure("error", Text);
+	WriteJSON(Writer, Data);
+	Return Writer.Close();
 	
 EndFunction
 

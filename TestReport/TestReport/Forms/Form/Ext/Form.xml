@@ -11,26 +11,16 @@
 		<Event name="OnClose">OnClose</Event>
 	</Events>
 	<ChildItems>
-		<LabelDecoration name="ClockLabel" id="3">
-			<Title formatted="false">
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>--:--:--</v8:content>
-				</v8:item>
-			</Title>
-			<ContextMenu name="ClockLabelContextMenu" id="4"/>
-			<ExtendedTooltip name="ClockLabelExtendedTooltip" id="5"/>
-		</LabelDecoration>
-		<LabelDecoration name="WeatherLabel" id="6">
-			<Title formatted="false">
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>Loading weather...</v8:content>
-				</v8:item>
-			</Title>
-			<ContextMenu name="WeatherLabelContextMenu" id="7"/>
-			<ExtendedTooltip name="WeatherLabelExtendedTooltip" id="8"/>
-		</LabelDecoration>
+		<HTMLDocumentField name="Widget" id="9">
+			<DataPath>WidgetHTML</DataPath>
+			<TitleLocation>None</TitleLocation>
+			<Width>90</Width>
+			<AutoMaxWidth>false</AutoMaxWidth>
+			<Height>14</Height>
+			<HorizontalStretch>true</HorizontalStretch>
+			<ContextMenu name="WidgetContextMenu" id="10"/>
+			<ExtendedTooltip name="WidgetExtendedTooltip" id="11"/>
+		</HTMLDocumentField>
 		<Button name="ShowReport" id="1">
 			<Type>UsualButton</Type>
 			<CommandName>Form.Command.ShowReport</CommandName>
@@ -49,6 +39,21 @@
 				<v8:Type>cfg:ExternalReportObject.TestReport</v8:Type>
 			</Type>
 			<MainAttribute>true</MainAttribute>
+		</Attribute>
+		<Attribute name="WidgetHTML" id="2">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Widget</v8:content>
+				</v8:item>
+			</Title>
+			<Type>
+				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
+			</Type>
 		</Attribute>
 	</Attributes>
 	<Commands>
