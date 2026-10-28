@@ -5,7 +5,32 @@
 	<ReportResultViewMode>Auto</ReportResultViewMode>
 	<ViewModeApplicationOnSetReportResult>Auto</ViewModeApplicationOnSetReportResult>
 	<AutoCommandBar name="FormCommandBar" id="-1"/>
+	<Events>
+		<Event name="OnCreateAtServer">OnCreateAtServer</Event>
+		<Event name="OnOpen">OnOpen</Event>
+		<Event name="OnClose">OnClose</Event>
+	</Events>
 	<ChildItems>
+		<LabelDecoration name="ClockLabel" id="3">
+			<Title formatted="false">
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>--:--:--</v8:content>
+				</v8:item>
+			</Title>
+			<ContextMenu name="ClockLabelContextMenu" id="4"/>
+			<ExtendedTooltip name="ClockLabelExtendedTooltip" id="5"/>
+		</LabelDecoration>
+		<LabelDecoration name="WeatherLabel" id="6">
+			<Title formatted="false">
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Loading weather...</v8:content>
+				</v8:item>
+			</Title>
+			<ContextMenu name="WeatherLabelContextMenu" id="7"/>
+			<ExtendedTooltip name="WeatherLabelExtendedTooltip" id="8"/>
+		</LabelDecoration>
 		<Button name="ShowReport" id="1">
 			<Type>UsualButton</Type>
 			<CommandName>Form.Command.ShowReport</CommandName>

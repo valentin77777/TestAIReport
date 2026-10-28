@@ -15,3 +15,5 @@
 - Rule of thumb: short columns (No., dates) at least ~40–60, text columns (names, contracts) ~60–120.
   Or use `"page": "A4-landscape"` with `"Nx"` proportions so widths fill the page.
 - Buttons on forms: set `<Type>UsualButton</Type>` explicitly (1C writes it on save).
+- form-edit generates handler stubs in Russian syntax (`&НаСервере`, `Процедура`), and companion
+  element names with Russian suffixes (`КонтекстноеМеню`, `РасширеннаяПодсказка`) — rewrite them in English.
