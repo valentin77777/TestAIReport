@@ -7,6 +7,7 @@
 	<AutoCommandBar name="FormCommandBar" id="-1"/>
 	<ChildItems>
 		<Button name="ShowReport" id="1">
+			<Type>UsualButton</Type>
 			<CommandName>Form.Command.ShowReport</CommandName>
 			<Title>
 				<v8:item>
