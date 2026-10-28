@@ -22,3 +22,6 @@
 - HTML field on Windows thin client may use the Internet Explorer 11 engine: write ES5 JavaScript,
   flexbox with -ms- prefixes, inline SVG, `<meta http-equiv="X-UA-Compatible" content="IE=edge">`,
   no external CDNs. Keep the HTML in a Text template and fill placeholders from code.
+- Clickable actions in an HTML widget: links `href="#act=<name>&value=<encodeURIComponent(text)>"`,
+  handled in the field's `OnClick` (EventData.Href, StandardProcessing = False,
+  DecodeString(..., StringEncodingMethod.URLEncoding)). Input values are synced into a link's href by JS.

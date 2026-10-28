@@ -115,6 +115,71 @@ Procedure RefreshWeather() Export
 	
 EndProcedure
 
+&AtClient
+Procedure WidgetOnClick(Item, EventData, StandardProcessing)
+	
+	// Links in the widget look like "#act=<action>&value=<url-encoded text>".
+	// We catch the click, stop the browser from navigating and run a 1C action instead.
+	Href = EventData.Href;
+	If Not ValueIsFilled(Href) Then
+		Return;
+	EndIf;
+	
+	Position = StrFind(Href, "#act=");
+	If Position = 0 Then
+		Return; // an ordinary link - let the HTML field handle it
+	EndIf;
+	
+	StandardProcessing = False;
+	
+	Action = Mid(Href, Position + 5);
+	Value = "";
+	ValuePosition = StrFind(Action, "&value=");
+	If ValuePosition > 0 Then
+		Value = DecodeString(Mid(Action, ValuePosition + 7), StringEncodingMethod.URLEncoding);
+		Action = Left(Action, ValuePosition - 1);
+	EndIf;
+	
+	If Action = "report" Then
+		ShowReport(Undefined);
+		
+	ElsIf Action = "notify" Then
+		ShowUserNotification("Weather in Chisinau", , Value, PictureLib.Information);
+		
+	ElsIf Action = "day" Then
+		ShowMessageBox(, Value, , "Forecast for Chisinau");
+		
+	ElsIf Action = "url" Then
+		GotoURL(Value);
+		
+	ElsIf Action = "open" Then
+		OpenAnyLink(Value);
+		
+	EndIf;
+	
+EndProcedure
+
+// Opens a 1C navigation link (e1cib/...), a web address or a file path.
+&AtClient
+Procedure OpenAnyLink(Link)
+	
+	If Not ValueIsFilled(Link) Then
+		ShowMessageBox(, "Paste a link first: a 1C navigation link (Shift+F11 on any document or list, e.g. e1cib/list/Catalog.Products) or a web address.");
+		Return;
+	EndIf;
+	
+	If StrStartsWith(Lower(Link), "www.") Then
+		Link = "https://" + Link;
+	EndIf;
+	
+	Try
+		GotoURL(Link);
+	Except
+		ShowMessageBox(, "Cannot open the link:" + Chars.LF + Link + Chars.LF + BriefErrorDescription(ErrorInfo()));
+	EndTry;
+	
+EndProcedure
+
 &AtServer
 Function BuildWidgetHTMLAtServer()
 	

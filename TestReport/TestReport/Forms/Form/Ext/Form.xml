@@ -16,10 +16,13 @@
 			<TitleLocation>None</TitleLocation>
 			<Width>90</Width>
 			<AutoMaxWidth>false</AutoMaxWidth>
-			<Height>14</Height>
+			<Height>18</Height>
 			<HorizontalStretch>true</HorizontalStretch>
 			<ContextMenu name="WidgetContextMenu" id="10"/>
 			<ExtendedTooltip name="WidgetExtendedTooltip" id="11"/>
+			<Events>
+				<Event name="OnClick">WidgetOnClick</Event>
+			</Events>
 		</HTMLDocumentField>
 		<Button name="ShowReport" id="1">
 			<Type>UsualButton</Type>

@@ -58,6 +58,33 @@
   .day-card .t .min { opacity: .6; margin-left: 6px; }
   .day-card .p { font-size: 11px; opacity: .75; margin-top: 2px; }
 
+  a { color: inherit; text-decoration: none; }
+  a.day-card { display: block; cursor: pointer; }
+
+  .actions { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;
+             margin-top: 14px; position: relative; }
+  .btn {
+    display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;
+    padding: 8px 14px; margin-right: 8px; border-radius: 22px; font-size: 13px; cursor: pointer;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); transition: background .2s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: rgba(255,255,255,.34); }
+  .btn.primary { background: #ffffff; color: #1d3c5e; font-weight: 600; }
+  .btn.primary:hover { background: #eaf4ff; }
+  .btn svg { width: 16px; height: 16px; margin-right: 7px; }
+  .linkbox {
+    -ms-flex: 1; flex: 1; display: -ms-flexbox; display: flex; margin-left: 4px;
+    background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.25); border-radius: 22px; padding: 3px;
+  }
+  .linkbox input {
+    -ms-flex: 1; flex: 1; border: 0; outline: 0; background: transparent; color: #fff;
+    font-family: inherit; font-size: 13px; padding: 5px 12px; min-width: 60px;
+  }
+  .linkbox input::-ms-input-placeholder { color: rgba(255,255,255,.6); }
+  .linkbox input::placeholder { color: rgba(255,255,255,.6); }
+  .linkbox .btn { margin: 0; padding: 5px 14px; }
+
   .error { margin-top: 16px; padding: 10px 14px; border-radius: 12px; font-size: 13px;
            background: rgba(0,0,0,.25); }
   .updated { position: absolute; right: 22px; bottom: 6px; font-size: 10px; opacity: .55; }
@@ -94,6 +121,20 @@
   </div>
 
   <div class="forecast" id="forecast"></div>
+
+  <div class="actions">
+    <a class="btn primary" href="#act=report" title="Build the clients and contracts report">
+      <svg viewBox="0 0 16 16"><rect x="2" y="8" width="3" height="6" rx="1" fill="#1d3c5e"/><rect x="6.5" y="4" width="3" height="10" rx="1" fill="#1d3c5e"/><rect x="11" y="1" width="3" height="13" rx="1" fill="#1d3c5e"/></svg>Build report</a>
+    <a class="btn" id="notifyLink" href="#act=notify" title="Show a 1C notification with the current weather">
+      <svg viewBox="0 0 16 16"><path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5v3L2 11.5h12L12.5 9V6A4.5 4.5 0 0 0 8 1.5z M6.3 13a1.8 1.8 0 0 0 3.4 0z" fill="#fff"/></svg>Notify me</a>
+    <a class="btn" href="#act=url&amp;value=https%3A%2F%2Fwww.windy.com%2F47.011%2F28.864%3F47.011%2C28.864%2C8" title="Open the live weather map in the browser">
+      <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M1.5 8h13 M8 1.5c2.2 2 2.2 11 0 13 M8 1.5c-2.2 2-2.2 11 0 13" fill="none" stroke="#fff" stroke-width="1.2"/></svg>Weather map</a>
+    <div class="linkbox">
+      <input id="linkInput" type="text" placeholder="Paste a 1C link (e1cib/...) or a web address"
+             onkeyup="syncLink()" onchange="syncLink()" onpaste="setTimeout(syncLink, 0)">
+      <a class="btn primary" id="openLink" href="#act=open&amp;value=">Open</a>
+    </div>
+  </div>
   <div class="updated" id="updated"></div>
 </div>
 
@@ -236,16 +277,31 @@ function renderWeather() {
   var html = "";
   for (var i = 0; i < dl.time.length; i++) {
     var dt = parseIsoDate(dl.time[i]);
-    html += '<div class="day-card' + (i === 0 ? ' today' : '') + '">' +
+    var details = (i === 0 ? "Today" : DAYS[dt.getDay()]) + ", " + dt.getDate() + " " + MONTHS[dt.getMonth()] + ": " +
+      weatherText(dl.weather_code[i]) + ", from " + Math.round(dl.temperature_2m_min[i]) + " to " +
+      Math.round(dl.temperature_2m_max[i]) + " °C, chance of precipitation " +
+      (dl.precipitation_probability_max[i] == null ? 0 : dl.precipitation_probability_max[i]) + "%.";
+    html += '<a class="day-card' + (i === 0 ? ' today' : '') + '" title="Click for details" href="#act=day&value=' +
+      encodeURIComponent(details) + '">' +
       '<div class="dn">' + (i === 0 ? "Today" : DAYS_SHORT[dt.getDay()]) + '</div>' +
       '<div class="icon">' + weatherIcon(dl.weather_code[i], true) + '</div>' +
       '<div class="t">' + Math.round(dl.temperature_2m_max[i]) + '&deg;' +
       '<span class="min">' + Math.round(dl.temperature_2m_min[i]) + '&deg;</span></div>' +
       '<div class="p">&#9730; ' + (dl.precipitation_probability_max[i] == null ? 0 : dl.precipitation_probability_max[i]) + '%</div>' +
-      '</div>';
+      '</a>';
   }
   fc.innerHTML = html;
+  document.getElementById("notifyLink").href = "#act=notify&value=" + encodeURIComponent(
+    "Chisinau: " + Math.round(c.temperature_2m) + " °C, " + weatherText(c.weather_code) +
+    ", feels like " + Math.round(c.apparent_temperature) + " °C, wind " + Math.round(c.wind_speed_10m) + " km/h");
   document.getElementById("updated").innerHTML = "Updated " + UPDATED + " &middot; Open-Meteo";
+}
+
+// The "Open" button is a link: its address always carries the text from the input box,
+// so 1C receives it in the OnClick event.
+function syncLink() {
+  var v = document.getElementById("linkInput").value;
+  document.getElementById("openLink").href = "#act=open&value=" + encodeURIComponent(v.replace(/^\s+|\s+$/g, ""));
 }
 
 tick();
