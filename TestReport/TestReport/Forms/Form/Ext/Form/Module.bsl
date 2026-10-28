@@ -141,6 +141,16 @@ Procedure WidgetOnClick(Item, EventData, StandardProcessing)
 	EndIf;
 	
 	If Action = "report" Then
+		// Build the report right inside the widget
+		ReportInWidget = True;
+		WidgetHTML = BuildWidgetHTMLAtServer();
+		
+	ElsIf Action = "hide" Then
+		ReportInWidget = False;
+		WidgetHTML = BuildWidgetHTMLAtServer();
+		
+	ElsIf Action = "window" Then
+		// The classic spreadsheet report in a separate window
 		ShowReport(Undefined);
 		
 	ElsIf Action = "notify" Then
@@ -196,8 +206,40 @@ Function BuildWidgetHTML()
 	
 	HTMLText = StrReplace(HTMLText, "/*WEATHER_JSON*/null", GetWeatherJSON());
 	HTMLText = StrReplace(HTMLText, "/*UPDATED*/", Format(CurrentSessionDate(), "DF=HH:mm"));
+	If ReportInWidget Then
+		HTMLText = StrReplace(HTMLText, "/*REPORT_JSON*/null", GetReportJSON());
+	EndIf;
 	
 	Return HTMLText;
+	
+EndFunction
+
+// Report data for the HTML table in the widget.
+&AtServer
+Function GetReportJSON()
+	
+	Rows = New Array;
+	LineNumber = 0;
+	For Each DataRow In GetReportData() Do
+		LineNumber = LineNumber + 1;
+		Row = New Structure;
+		Row.Insert("num", LineNumber);
+		Row.Insert("client", String(DataRow.Client));
+		Row.Insert("contract", String(DataRow.Contract));
+		Row.Insert("date", Format(DataRow.ContractDate, "DLF=D"));
+		Row.Insert("iso", Format(DataRow.ContractDate, "DF=yyyy-MM-dd"));
+		Rows.Add(Row);
+	EndDo;
+	
+	Data = New Structure;
+	Data.Insert("title", "Clients and contracts");
+	Data.Insert("generated", Format(CurrentSessionDate(), "DLF=DT"));
+	Data.Insert("rows", Rows);
+	
+	Writer = New JSONWriter;
+	Writer.SetString(New JSONWriterSettings(JSONLineBreak.None));
+	WriteJSON(Writer, Data);
+	Return Writer.Close();
 	
 EndFunction
 
