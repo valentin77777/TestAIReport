@@ -37,7 +37,7 @@
 			<c>
 				<c>
 					<f>4</f>
-					<parameter>ЗаголовокОтчета</parameter>
+					<parameter>ReportTitle</parameter>
 				</c>
 			</c>
 		</row>
@@ -58,7 +58,7 @@
 					<tl>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>№</v8:content>
+							<v8:content>No.</v8:content>
 						</v8:item>
 					</tl>
 				</c>
@@ -69,7 +69,7 @@
 					<tl>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Клиент</v8:content>
+							<v8:content>Client</v8:content>
 						</v8:item>
 					</tl>
 				</c>
@@ -80,7 +80,7 @@
 					<tl>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Контракт</v8:content>
+							<v8:content>Contract</v8:content>
 						</v8:item>
 					</tl>
 				</c>
@@ -94,19 +94,19 @@
 			<c>
 				<c>
 					<f>7</f>
-					<parameter>НомерСтроки</parameter>
+					<parameter>LineNumber</parameter>
 				</c>
 			</c>
 			<c>
 				<c>
 					<f>8</f>
-					<parameter>Клиент</parameter>
+					<parameter>Client</parameter>
 				</c>
 			</c>
 			<c>
 				<c>
 					<f>8</f>
-					<parameter>Контракт</parameter>
+					<parameter>Contract</parameter>
 				</c>
 			</c>
 		</row>
@@ -121,17 +121,17 @@
 		<w>2</w>
 	</merge>
 	<namedItem xsi:type="NamedItemCells">
-		<name>Заголовок</name>
+		<name>Header</name>
 		<area>
 			<type>Rows</type>
-			<beginRow>0</beginRow>
-			<endRow>1</endRow>
+			<beginRow>2</beginRow>
+			<endRow>2</endRow>
 			<beginColumn>-1</beginColumn>
 			<endColumn>-1</endColumn>
 		</area>
 	</namedItem>
 	<namedItem xsi:type="NamedItemCells">
-		<name>Строка</name>
+		<name>Row</name>
 		<area>
 			<type>Rows</type>
 			<beginRow>3</beginRow>
@@ -141,11 +141,11 @@
 		</area>
 	</namedItem>
 	<namedItem xsi:type="NamedItemCells">
-		<name>Шапка</name>
+		<name>Title</name>
 		<area>
 			<type>Rows</type>
-			<beginRow>2</beginRow>
-			<endRow>2</endRow>
+			<beginRow>0</beginRow>
+			<endRow>1</endRow>
 			<beginColumn>-1</beginColumn>
 			<endColumn>-1</endColumn>
 		</area>
