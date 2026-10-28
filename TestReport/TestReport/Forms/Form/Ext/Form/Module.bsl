@@ -35,6 +35,7 @@ Function GenerateReportAtServer()
 		AreaRow.Parameters.LineNumber = LineNumber;
 		AreaRow.Parameters.Client     = DataRow.Client;
 		AreaRow.Parameters.Contract   = DataRow.Contract;
+		AreaRow.Parameters.ContractDate = DataRow.ContractDate;
 		SpreadsheetDoc.Put(AreaRow);
 	EndDo;
 	
@@ -51,7 +52,8 @@ Function GetReportData()
 	//	Query.Text =
 	//	"SELECT
 	//	|	Contracts.Owner AS Client,
-	//	|	Contracts.Ref AS Contract
+	//	|	Contracts.Ref AS Contract,
+	//	|	Contracts.Date AS ContractDate
 	//	|FROM
 	//	|	Catalog.ДоговорыКонтрагентов AS Contracts";
 	//	Return Query.Execute().Unload();
@@ -59,18 +61,20 @@ Function GetReportData()
 	ReportData = New ValueTable;
 	ReportData.Columns.Add("Client");
 	ReportData.Columns.Add("Contract");
+	ReportData.Columns.Add("ContractDate", New TypeDescription("Date"));
 	
-	AddDataRow(ReportData, "Alpha LLC",    "Contract No. 1 dated 01.01.2026");
-	AddDataRow(ReportData, "Beta LLC",     "Contract No. 2 dated 15.02.2026");
-	AddDataRow(ReportData, "John Smith",   "Contract No. 3 dated 10.03.2026");
+	AddDataRow(ReportData, "Alpha LLC",  "Contract No. 1", Date(2026, 1, 1));
+	AddDataRow(ReportData, "Beta LLC",   "Contract No. 2", Date(2026, 2, 15));
+	AddDataRow(ReportData, "John Smith", "Contract No. 3", Date(2026, 3, 10));
 	
 	Return ReportData;
 	
 EndFunction
 
 &AtServer
-Procedure AddDataRow(ReportData, Client, Contract)
+Procedure AddDataRow(ReportData, Client, Contract, ContractDate)
 	NewRow = ReportData.Add();
 	NewRow.Client   = Client;
 	NewRow.Contract = Contract;
+	NewRow.ContractDate = ContractDate;
 EndProcedure
