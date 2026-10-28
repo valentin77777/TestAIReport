@@ -1,0 +1,7 @@
+.v8-project.json
+build/
+base/
+*.epf
+*.erf
+*.log
+__pycache__/
