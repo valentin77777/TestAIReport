@@ -6,10 +6,15 @@
 	<ViewModeApplicationOnSetReportResult>Auto</ViewModeApplicationOnSetReportResult>
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1"/>
 	<ChildItems>
-		<Button name="Команда1" id="1">
-			<Type>UsualButton</Type>
-			<CommandName>Form.Command.Команда1</CommandName>
-			<ExtendedTooltip name="Команда1РасширеннаяПодсказка" id="2"/>
+		<Button name="ОтобразитьОтчет" id="1">
+			<CommandName>Form.Command.ОтобразитьОтчет</CommandName>
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Отобразить отчет</v8:content>
+				</v8:item>
+			</Title>
+			<ExtendedTooltip name="ОтобразитьОтчетРасширеннаяПодсказка" id="2"/>
 		</Button>
 	</ChildItems>
 	<Attributes>
@@ -21,8 +26,14 @@
 		</Attribute>
 	</Attributes>
 	<Commands>
-		<Command name="Команда1" id="1">
-			<Action>Команда1</Action>
+		<Command name="ОтобразитьОтчет" id="2">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Отобразить отчет</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ОтобразитьОтчет</Action>
 		</Command>
 	</Commands>
 </Form>
